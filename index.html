@@ -106,6 +106,30 @@ header{padding:20px 0 6px;display:flex;align-items:center;justify-content:space-
 .loading{padding:60px 0;text-align:center;color:var(--dim)}
 .beads{position:fixed;left:18px;top:140px;display:flex;flex-direction:column;gap:140px;pointer-events:none;opacity:.85}
 .beads i{width:12px;height:12px;border-radius:50%;display:block}
+
+/* view switch */
+.views{display:flex;gap:26px;margin:6px 0 2px}
+.vtab{font:inherit;font-size:17px;font-weight:700;color:var(--dim);background:none;border:0;padding:6px 0 10px;cursor:pointer;position:relative}
+.vtab.on{color:var(--ink)}
+.vtab.on:after{content:"";position:absolute;right:50%;transform:translateX(50%);bottom:0;width:8px;height:8px;border-radius:50%;background:var(--terra)}
+[hidden]{display:none !important}
+/* events board */
+.eh{font-family:"SimplerMono",monospace;font-size:11.5px;letter-spacing:.08em;color:var(--dim);margin:26px 0 8px;display:flex;align-items:center;gap:8px}
+.eh:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--terra)}
+.ev{position:relative;display:flex;gap:16px;align-items:flex-start;padding:15px 0 13px;border-top:1px solid var(--line2)}
+.ev:before{content:"";position:absolute;right:0;top:-5px;width:9px;height:9px;border-radius:50%;background:var(--dim)}
+.ev.p-lotem:before{background:var(--terra)} .ev.p-meital:before{background:var(--green)} .ev.p-ram:before{background:var(--indigo)} .ev.p-other:before{background:var(--sky)}
+.ev .dt{flex:0 0 52px;text-align:center;line-height:1.05}
+.ev .dt .d{font-weight:700;font-size:26px}
+.ev .dt .w{font-size:12.5px;color:var(--dim);margin-top:3px}
+.ev .dt .ap{font-size:13px;color:var(--dim);line-height:1.3;padding-top:3px}
+.ev .bd{flex:1;min-width:0}
+.ev .nm{font-weight:700;font-size:18px;line-height:1.25}
+.ev .mt{color:var(--dim);font-size:14.5px;margin-top:3px;line-height:1.4}
+.ev .tg{display:inline-block;font-size:12.5px;color:var(--terra);margin-top:5px}
+.ev .nt{font-size:13.5px;color:var(--dim);margin-top:4px}
+.ev .ic{margin-top:2px}
+.ev.today .dt .d{color:var(--terra)}
 @media (max-width:860px){.beads{display:none}}
 @media (max-width:420px){.wrap{padding:0 16px 80px}.name{font-size:18px}.ic{width:38px;height:38px}.fgroup{gap:14px}.fgroup + .fgroup{padding-right:14px}.filters{gap:4px 14px}}
 </style>
@@ -120,6 +144,8 @@ header{padding:20px 0 6px;display:flex;align-items:center;justify-content:space-
     </div>
     <div class="hello" id="hello"></div>
   </header>
+  <nav class="views"><button class="vtab on" data-view="m">מאגר</button><button class="vtab" data-view="e">אירועים</button></nav>
+  <div id="viewM">
 
   <div class="search">
     <div class="q">
@@ -147,6 +173,8 @@ header{padding:20px 0 6px;display:flex;align-items:center;justify-content:space-
   </div>
 
   <div id="results"><div class="loading">טוען את המאגר...</div></div>
+  </div>
+  <div id="viewE" hidden><div id="events"><div class="loading">טוען אירועים...</div></div></div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -193,6 +221,7 @@ Runner.prototype.api_getData = function(force){ this._go(apiCall('data', { force
 Runner.prototype.api_getProjects = function(){ this._go(apiCall('projects')); };
 Runner.prototype.api_addNote = function(note){ this._go(apiCall('note', { note: note })); };
 Runner.prototype.api_setHidden = function(id, hide){ this._go(apiCall('hide', { id: id, hide: hide })); };
+Runner.prototype.api_getEvents = function(){ this._go(apiCall('events')); };
 window.google = { script: { run: new Runner() } };
 
 function injectFonts(a){
@@ -495,7 +524,54 @@ document.querySelectorAll('.ftog').forEach(function(b){
   });
 });
 document.querySelector('.ftog[data-k="type"][data-v=""]').classList.add('on');
+
+/* ---------- events board ---------- */
+var EVENTS = null, VIEW = 'm';
+var HEB_DAYS = ['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];
+var HEB_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+function personClass(s){ s=String(s||''); if(s.indexOf('לוטם')>=0) return 'p-lotem'; if(s.indexOf('מיטל')>=0) return 'p-meital'; if(/^רם(\s|$)/.test(s)) return 'p-ram'; return s&&s!=='פתוח'?'p-other':''; }
+function evRow(e){
+  var dt;
+  if (e.date){ var p=e.date.split('-'); var d=new Date(+p[0],+p[1]-1,+p[2]); dt='<div class="d">'+(+p[2])+'</div><div class="w">יום '+HEB_DAYS[d.getDay()]+(e.time?' · '+esc(e.time):'')+'</div>'; }
+  else dt='<div class="ap">'+esc(e.approx||'בקרוב')+'</div>';
+  var who=[e.lead&&e.lead!=='פתוח'?esc(e.lead):'אין אחראית עדיין', e.helper?esc(e.helper):''].filter(Boolean).join(' + ');
+  var meta=[e.place?esc(e.place):'', who].filter(Boolean).join(' · ');
+  var tag = e.status && e.status!=='סגור' ? '<span class="tg">'+esc(e.status)+'</span>' : '';
+  var todayStr = new Date().toISOString().slice(0,10);
+  var FOLDER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3.5 6.5h6l2 2h9v10a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1z"/></svg>';
+  return '<div class="ev '+personClass(e.lead)+(e.date===todayStr?' today':'')+'">'+
+    '<div class="dt">'+dt+'</div>'+
+    '<div class="bd"><div class="nm">'+esc(e.name)+'</div>'+(meta?'<div class="mt">'+meta+'</div>':'')+tag+(e.note?'<div class="nt">'+esc(e.note)+'</div>':'')+'</div>'+
+    (e.dossier?'<a class="ic" href="'+esc(e.dossier)+'" target="_blank" rel="noopener" aria-label="תיק הפקה">'+FOLDER+'</a>':'')+
+  '</div>';
+}
+function renderEvents(){
+  var box=document.getElementById('events');
+  if (!EVENTS){ return; }
+  if (!EVENTS.length){ box.innerHTML='<div class="empty">אין אירועים קרובים בלוח.</div>'; return; }
+  var dated=EVENTS.filter(function(e){return e.date;}).sort(function(a,b){ return (a.date+a.time)<(b.date+b.time)?-1:1; });
+  var approx=EVENTS.filter(function(e){return !e.date;}).sort(function(a,b){ return a.order-b.order; });
+  var html='', lastM='';
+  dated.forEach(function(e){ var p=e.date.split('-'); var m=HEB_MONTHS[+p[1]-1]+' '+p[0]; if(m!==lastM){ html+='<div class="eh">'+m+'</div>'; lastM=m; } html+=evRow(e); });
+  if (approx.length){ html+='<div class="eh">תאריך עוד לא סגור</div>'; approx.forEach(function(e){ html+=evRow(e); }); }
+  box.innerHTML=html;
+}
+function loadEvents(){
+  try{ var c=JSON.parse(localStorage.getItem('connecta_events')||'null'); if(c){ EVENTS=c; renderEvents(); } }catch(e){}
+  google.script.run.withSuccessHandler(function(ev){ EVENTS=ev||[]; try{ localStorage.setItem('connecta_events', JSON.stringify(EVENTS)); }catch(e){} renderEvents(); })
+    .withFailureHandler(function(err){ if(!EVENTS) document.getElementById('events').innerHTML='<div class="empty">לא הצלחתי לטעון אירועים: '+esc(err.message||err)+'</div>'; }).api_getEvents();
+}
+function setView(v){
+  VIEW=v; document.querySelectorAll('.vtab').forEach(function(b){ b.classList.toggle('on', b.dataset.view===v); });
+  document.getElementById('viewM').hidden = v!=='m'; document.getElementById('viewE').hidden = v!=='e';
+  try{ localStorage.setItem('connecta_view', v); }catch(e){}
+  if (v==='e' && EVENTS===null) loadEvents();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.vtab').forEach(function(b){ b.addEventListener('click', function(){ setView(b.dataset.view); }); });
+
 if (KEY) load(false);
+try{ if(KEY && localStorage.getItem('connecta_view')==='e') setView('e'); }catch(e){}
 </script>
 </body>
 </html>
