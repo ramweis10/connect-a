@@ -3,94 +3,132 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>נרשמים למאגר של קונקטה</title>
+<title>הרשמה למאגר אמנים וספקים של קונקטה</title>
 <meta name="description" content="שתי דקות מהטלפון, ואתם במאגר של קונקטה">
-<meta property="og:title" content="נרשמים למאגר של קונקטה">
+<meta property="og:title" content="הרשמה למאגר אמנים וספקים של קונקטה">
 <meta property="og:description" content="שתי דקות מהטלפון, ואתם במאגר של קונקטה">
 <meta property="og:image" content="https://ramweis10.github.io/connect-a/icons/icon-512.png">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#1c1c1c">
 <link rel="icon" href="../icons/icon-192.png">
 <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
-<!-- Public page: the licensed Simpler fonts are never served here, so it uses the phone's own system font. -->
+<!-- Brand: Connecta brand skill (dark surface, ruled lines every 32px with beads, the path on the opening, mono signature).
+     Fonts: "Simpler" is named first; it is not served on this public page until Ram confirms the web license, so the phone's
+     own font shows meanwhile. To switch on: add the @font-face rules here (see build_pwa.py injectFonts). -->
 <style>
 :root{--bg:#1c1c1c;--ink:#f2efe8;--dim:#8a8780;--line:rgba(242,239,232,.14);--line2:rgba(242,239,232,.55);
---terra:#e0694a;--green:#3c7a62;--sky:#4eb2d6;--olive:#c4c43a}
+--terra:#e0694a;--indigo:#5b4fd6;--green:#3c7a62;--sky:#4eb2d6;--mauve:#c58a98;--olive:#c4c43a}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
-body{font-family:-apple-system,system-ui,"Segoe UI",Arial,sans-serif;font-size:17px;line-height:1.45;
-  padding:calc(28px + env(safe-area-inset-top)) 0 calc(60px + env(safe-area-inset-bottom))}
-.wrap{max-width:520px;margin:0 auto;padding:0 20px}
-.wordmark{height:16px;filter:invert(1);opacity:.95;display:block}
-h1{font-size:30px;line-height:1.15;margin:34px 0 8px;font-weight:700;letter-spacing:-.01em}
-.lead{color:var(--dim);margin:0 0 30px}
-.sec{border-top:1px solid var(--line2);padding-top:14px;margin-top:30px}
-.sec h2{font-size:14px;font-weight:600;color:var(--dim);margin:0 0 4px}
-.sec .hint{font-size:14px;color:var(--dim);margin:0 0 8px}
-label.f{display:block;margin-top:18px;font-size:15px;color:var(--dim)}
-label.f b{color:var(--terra);font-weight:400}
-input[type=text],input[type=tel],input[type=url],textarea{width:100%;background:none;border:0;border-bottom:1.5px solid var(--line2);
-  color:var(--ink);font:inherit;font-size:19px;padding:8px 0;outline:0;border-radius:0}
+body{font-family:"Simpler",-apple-system,system-ui,"Segoe UI",Arial,sans-serif;font-size:17px;line-height:1.45;
+  padding:env(safe-area-inset-top) 0 calc(48px + env(safe-area-inset-bottom))}
+.ruled{background-image:repeating-linear-gradient(to bottom,transparent 0 31px,var(--line) 31px 32px)}
+.wrap{max-width:560px;margin:0 auto;padding:0 20px;position:relative}
+.sig{font-size:13px;letter-spacing:.02em;color:var(--dim);display:flex;align-items:center;gap:8px}
+.sig:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--terra);flex:none}
+
+/* opening: wordmark, the path in the left third, headline in the right two thirds */
+.top{position:relative;height:288px;margin:0 -20px;padding:0 20px}
+.topin{position:relative;height:288px}
+.top .wordmark{position:absolute;right:0;top:26px;height:15px;filter:invert(1);opacity:.95}
+.top .path{position:absolute;left:0;top:0;overflow:visible}
+.top h1{position:absolute;right:0;bottom:44px;width:100%;margin:0;font-size:31px;line-height:1.16;font-weight:700;letter-spacing:-.01em}
+.top .sig{position:absolute;right:0;bottom:10px}
+.lead{color:var(--dim);margin:22px 0 0;font-size:16px;line-height:1.6;max-width:90%}
+
+/* fields: label line, then the input sitting on a solid rule */
+.field{margin-top:28px}
+.lab{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--dim)}
+.lab .opt{font-size:12px;opacity:.75}
+input[type=text],input[type=tel],input[type=url],textarea{width:100%;display:block;background:none;border:0;border-bottom:1.5px solid var(--line2);
+  color:var(--ink);font:inherit;font-size:20px;padding:6px 0 7px;outline:0;border-radius:0;-webkit-appearance:none;appearance:none}
 input:focus,textarea:focus{border-bottom-color:var(--ink)}
-input::placeholder,textarea::placeholder{color:rgba(242,239,232,.3)}
-textarea{resize:none;min-height:64px}
+input::placeholder,textarea::placeholder{color:rgba(242,239,232,.28)}
+textarea{resize:none;min-height:66px}
 input[type=tel]{direction:ltr;text-align:right}
-.grp{margin-top:18px}
-.grp .gt{font-size:13px;color:var(--dim);margin-bottom:2px}
-.opt{display:flex;align-items:flex-start;gap:12px;width:100%;background:none;border:0;border-bottom:1px solid var(--line);
-  color:var(--ink);font:inherit;text-align:right;padding:12px 0;cursor:pointer}
-.opt .bead{flex:none;width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line2);margin-top:5px}
-.opt.on .bead{background:var(--terra);border-color:var(--terra)}
-.opt .t{display:block;font-size:17px}
-.opt .s{display:block;font-size:14px;color:var(--dim);margin-top:1px}
-.opt.off{opacity:.35}
-#otherBox{display:none;margin-top:6px}
+
+/* categories: two columns, each one a hairline with a bead on its right end (the app's card language) */
+.what{margin-top:46px}
+.what h2{font-size:22px;font-weight:700;margin:0}
+.what .hint{font-size:14px;color:var(--dim);margin:2px 0 0}
+.gt{font-size:13px;color:var(--dim);margin:24px 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}
+.o{position:relative;display:block;width:100%;background:none;border:0;border-top:1px solid var(--line2);color:var(--dim);
+  font:inherit;font-size:16px;text-align:right;padding:9px 0 12px;cursor:pointer;line-height:1.3}
+.o:before{content:"";position:absolute;right:0;top:-4.5px;width:8px;height:8px;border-radius:50%;background:var(--dim);transition:transform .15s}
+.o .s{display:block;font-size:12.5px;margin-top:3px;opacity:.85}
+.o.on{color:var(--ink)}
+.o.on:before{background:var(--bead,var(--terra));transform:scale(1.5)}
+.o.off{opacity:.35}
+.o.wide{grid-column:1 / -1}
+#otherBox{display:none}
 #otherBox.show{display:block}
-.consent{display:flex;gap:12px;align-items:flex-start;margin-top:30px;font-size:15px;cursor:pointer}
+
+.consent{display:flex;gap:12px;align-items:flex-start;margin-top:40px;font-size:15px;cursor:pointer;color:var(--ink)}
 .consent input{position:absolute;opacity:0;pointer-events:none}
-.consent .box{flex:none;width:20px;height:20px;border:1.5px solid var(--line2);margin-top:2px;position:relative}
-.consent input:checked + .box{background:var(--ink);border-color:var(--ink)}
-.consent input:checked + .box:after{content:"";position:absolute;right:6px;top:2px;width:5px;height:10px;border:solid var(--bg);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.consent .box{flex:none;width:20px;height:20px;border:1.5px solid var(--line2);border-radius:50%;margin-top:1px;position:relative}
+.consent input:checked + .box{border-color:var(--terra)}
+.consent input:checked + .box:after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--terra)}
 .hp{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);opacity:0}
-#go{margin-top:30px;border:1.2px solid var(--ink);border-radius:999px;background:var(--ink);color:var(--bg);font:inherit;
-  font-size:18px;font-weight:600;padding:12px 34px;cursor:pointer}
+.send{display:flex;align-items:center;gap:14px;margin-top:30px}
+#go{display:flex;align-items:center;gap:12px;border:1.2px solid var(--ink);border-radius:999px;background:none;color:var(--ink);
+  font:inherit;font-size:18px;padding:10px 12px 10px 22px;cursor:pointer}
+#go .arr{width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-size:17px;line-height:1}
 #go[disabled]{opacity:.5}
 #err{color:var(--terra);font-size:15px;min-height:22px;margin-top:12px}
-#done{display:none}
-#done h1{margin-top:60px}
-#done .bead{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--olive);margin-left:8px;vertical-align:middle}
-.small{font-size:13px;color:var(--dim);margin-top:40px}
+#done{display:none;padding-bottom:40px}
+#done .lead{max-width:none}
+.foot{margin-top:56px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <img class="wordmark" src="../icons/wordmark.png" alt="קונקטה">
+  <div class="top ruled"><div class="topin">
+    <img class="wordmark" src="../icons/wordmark.png" alt="קונקטה">
+    <!-- the path: right angles only, beads exactly on the 32px ruled lines, left third, never crossing the text -->
+    <svg class="path" width="150" height="170" viewBox="0 0 150 170" aria-hidden="true">
+      <path d="M134 31.5 H86 V95.5 H34 V127.5 H104 V159.5 H12" fill="none" stroke="#f2efe8" stroke-opacity=".7" stroke-width="1.4"/>
+      <circle cx="134" cy="31.5" r="6" fill="#e0694a"/>
+      <circle cx="86" cy="95.5" r="4.5" fill="#4eb2d6"/>
+      <circle cx="34" cy="95.5" r="8" fill="#5b4fd6"/>
+      <circle cx="104" cy="159.5" r="5" fill="#c4c43a"/>
+      <circle cx="12" cy="159.5" r="6.5" fill="#3c7a62"/>
+    </svg>
+    <h1 id="title">הרשמה למאגר אמנים וספקים של קונקטה</h1>
+    <div class="sig">הפקות וחיבורים חדשים</div>
+  </div></div>
 
   <form id="form" novalidate>
-    <h1>נרשמים למאגר של קונקטה</h1>
     <p class="lead">שתי דקות מהטלפון. מה אתם עושים, איפה אתם, ואיפה רואים את העבודה שלכם.</p>
 
-    <label class="f" for="name">שם מלא <b>*</b></label>
-    <input type="text" id="name" autocomplete="name" maxlength="80">
-
-    <label class="f" for="phone">נייד <b>*</b></label>
-    <input type="tel" id="phone" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="050-0000000">
-
-    <div class="sec">
-      <h2>מה אתם עושים? <b style="color:var(--terra);font-weight:400">*</b></h2>
-      <p class="hint">אפשר לבחור עד שניים</p>
-      <div id="cats"></div>
-      <div id="otherBox"><input type="text" id="other" maxlength="60" placeholder="מה בדיוק?"></div>
+    <div class="field">
+      <label class="lab" for="name"><span>שם מלא</span></label>
+      <input type="text" id="name" autocomplete="name" maxlength="80">
+    </div>
+    <div class="field">
+      <label class="lab" for="phone"><span>נייד</span></label>
+      <input type="tel" id="phone" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="050-0000000">
     </div>
 
-    <label class="f" for="desc">במילים שלכם</label>
-    <textarea id="desc" maxlength="300" placeholder="למשל: תקליטן חתונות ומסיבות, ציוד משלי"></textarea>
+    <div class="what">
+      <h2>מה אתם עושים?</h2>
+      <p class="hint">אפשר לבחור עד שניים</p>
+      <div id="cats"></div>
+      <div id="otherBox" class="field"><input type="text" id="other" maxlength="60" placeholder="מה בדיוק?"></div>
+    </div>
 
-    <label class="f" for="city">עיר</label>
-    <input type="text" id="city" autocomplete="address-level2" maxlength="40" placeholder="ירושלים">
-
-    <label class="f" for="link">קישור לאינסטגרם, לאתר או לתיק עבודות</label>
-    <input type="url" id="link" inputmode="url" autocapitalize="none" maxlength="200" placeholder="instagram.com/...">
+    <div class="field">
+      <label class="lab" for="desc"><span>במילים שלכם</span><span class="opt">לא חובה</span></label>
+      <textarea id="desc" maxlength="300" placeholder="למשל: תקליטן חתונות ומסיבות, ציוד משלי"></textarea>
+    </div>
+    <div class="field">
+      <label class="lab" for="city"><span>עיר</span><span class="opt">לא חובה</span></label>
+      <input type="text" id="city" autocomplete="address-level2" maxlength="40">
+    </div>
+    <div class="field">
+      <label class="lab" for="link"><span>אינסטגרם, אתר או תיק עבודות</span><span class="opt">לא חובה</span></label>
+      <input type="url" id="link" inputmode="url" autocapitalize="none" maxlength="200" placeholder="instagram.com/...">
+    </div>
 
     <div class="hp" aria-hidden="true"><input type="text" id="web" tabindex="-1" autocomplete="off"></div>
 
@@ -100,30 +138,29 @@ input[type=tel]{direction:ltr;text-align:right}
       <span>אני מסכים/ה שקונקטה תשמור את הפרטים ותפנה אליי לעבודות</span>
     </label>
 
-    <button type="submit" id="go">שליחה</button>
+    <div class="send"><button type="submit" id="go"><span>שליחה</span><span class="arr">←</span></button></div>
     <div id="err"></div>
   </form>
 
   <div id="done">
-    <h1><span class="bead"></span>תודה, <span id="doneName"></span></h1>
     <p class="lead">הפרטים שלכם אצלנו, במאגר של קונקטה.</p>
   </div>
 
-  <p class="small">קונקטה · ירושלים</p>
+  <div class="foot sig">קונקטה · ירושלים</div>
 </div>
 
 <script>
 var API_URL = 'https://script.google.com/macros/s/AKfycbwi2DKWb5Zk756iFTRZSvMiqGt9icxy4hDqyXngnrBcWaOSjN4YIJTeLsO4Om16wqm1/exec';
-// value = the category name in the maagar (do not change, the app searches by it); t = what the form shows; s = hint
+// v = the category name in the maagar (do not change, the app searches by it); t = what the form shows; s = hint
 var GROUPS = [
   ['צוות ושטח', [
-    { v: 'הפקה', t: 'מפיק/ה', s: 'מנהל/ת אירוע או פרויקט מהתחלה עד הסוף: תקציב, ספקים, לוח זמנים' },
-    { v: 'עוזרי הפקה וצוות שטח', t: 'צוות הפקה ושטח', s: 'הקמות, פירוקים, ריצות, עזרה ביום האירוע' },
+    { v: 'הפקה', t: 'מפיק/ה', s: 'אירוע שלם, מהתחלה עד הסוף' },
+    { v: 'עוזרי הפקה וצוות שטח', t: 'צוות הפקה ושטח', s: 'הקמות, ריצות, יום האירוע' },
     { v: 'בר ושתייה', t: 'בר ושתייה' },
     { v: 'אבטחה וסדרנות', t: 'אבטחה וסדרנות' },
     { v: 'ניהול במה וטכני', t: 'ניהול במה וטכני' },
     { v: 'הגברה ותאורה', t: 'הגברה ותאורה' }
-  ]],
+  ], 'var(--terra)'],
   ['במה ויצירה', [
     { v: 'מוזיקה והופעות', t: 'מוזיקה והופעות' },
     { v: "דיג'יי", t: "דיג'יי" },
@@ -131,35 +168,37 @@ var GROUPS = [
     { v: 'מחול', t: 'מחול' },
     { v: 'הנחיה', t: 'הנחיה' },
     { v: 'סדנאות', t: 'סדנאות' },
-    { v: 'ילדים ונוער', t: 'ילדים ונוער' }
-  ]],
+    { v: 'ילדים ונוער', t: 'ילדים ונוער' },
+    { v: 'אמנות חזותית', t: 'אמנות חזותית' }
+  ], 'var(--indigo)'],
   ['תיעוד ועיצוב', [
     { v: 'צילום', t: 'צילום' },
     { v: 'קולנוע ומדיה', t: 'קולנוע ומדיה' },
     { v: 'עיצוב גרפי ומיתוג', t: 'עיצוב גרפי ומיתוג' },
-    { v: 'יחצ ושיווק', t: 'יח״צ ושיווק' },
-    { v: 'אמנות חזותית', t: 'אמנות חזותית' }
-  ]],
-  ['', [ { v: '__other', t: 'משהו אחר' } ]]
+    { v: 'יחצ ושיווק', t: 'יח״צ ושיווק' }
+  ], 'var(--sky)'],
+  ['', [ { v: '__other', t: 'משהו אחר', wide: true } ], 'var(--olive)']
 ];
 var picked = [], T0 = Date.now();
 var catsEl = document.getElementById('cats');
 GROUPS.forEach(function (g) {
-  var d = document.createElement('div'); d.className = 'grp';
-  if (g[0]) { var h = document.createElement('div'); h.className = 'gt'; h.textContent = g[0]; d.appendChild(h); }
+  if (g[0]) { var h = document.createElement('div'); h.className = 'gt'; h.textContent = g[0]; catsEl.appendChild(h); }
+  else { var sp = document.createElement('div'); sp.style.height = '18px'; catsEl.appendChild(sp); }
+  var grid = document.createElement('div'); grid.className = 'grid';
   g[1].forEach(function (o) {
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'opt'; b.dataset.v = o.v;
-    b.innerHTML = '<span class="bead"></span><span><span class="t"></span>' + (o.s ? '<span class="s"></span>' : '') + '</span>';
-    b.querySelector('.t').textContent = o.t; if (o.s) b.querySelector('.s').textContent = o.s;
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'o' + (o.wide ? ' wide' : ''); b.dataset.v = o.v;
+    b.style.setProperty('--bead', g[2]);
+    var t = document.createElement('span'); t.textContent = o.t; b.appendChild(t);
+    if (o.s) { var s = document.createElement('span'); s.className = 's'; s.textContent = o.s; b.appendChild(s); }
     b.addEventListener('click', function () { toggle(o.v); });
-    d.appendChild(b);
+    grid.appendChild(b);
   });
-  catsEl.appendChild(d);
+  catsEl.appendChild(grid);
 });
 function toggle(v) {
   var i = picked.indexOf(v);
   if (i >= 0) picked.splice(i, 1); else if (picked.length < 2) picked.push(v); else return;
-  document.querySelectorAll('.opt').forEach(function (b) {
+  document.querySelectorAll('.o').forEach(function (b) {
     var on = picked.indexOf(b.dataset.v) >= 0;
     b.classList.toggle('on', on); b.classList.toggle('off', !on && picked.length >= 2);
   });
@@ -179,21 +218,21 @@ document.getElementById('form').addEventListener('submit', function (e) {
   var other = picked.indexOf('__other') >= 0 ? val('other') : '';
   if (!cats.length && !other) return err(picked.length ? 'כתבו מה בדיוק אתם עושים' : 'בחרו מה אתם עושים');
   if (!document.getElementById('consent').checked) return err('צריך לסמן את האישור כדי להירשם');
-  var go = document.getElementById('go'); go.disabled = true; go.textContent = 'שולח...'; err('');
+  var go = document.getElementById('go'); go.disabled = true; go.firstChild.textContent = 'שולח...'; err('');
   var f = { name: val('name'), phone: phone, cats: cats, other: other, desc: val('desc'), city: val('city'),
             link: val('link'), consent: true, web: val('web'), t: T0 };
   fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ api: 'join', f: f }) })
     .then(function (r) { return r.json(); })
     .then(function (j) {
       if (j && j.ok) {
-        document.getElementById('doneName').textContent = val('name').split(/\s+/)[0];
+        document.getElementById('title').textContent = 'תודה, ' + val('name').split(/\s+/)[0];
         document.getElementById('form').style.display = 'none';
         document.getElementById('done').style.display = 'block';
         window.scrollTo(0, 0);
       } else { throw new Error(j && j.message || 'משהו השתבש, נסו שוב'); }
     })
     .catch(function (x) {
-      go.disabled = false; go.textContent = 'שליחה';
+      go.disabled = false; go.firstChild.textContent = 'שליחה';
       err(x && x.message && !/fetch|network|JSON/i.test(x.message) ? x.message : 'אין חיבור כרגע, נסו שוב');
     });
 });
