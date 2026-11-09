@@ -236,6 +236,19 @@ document.getElementById('gateGo').addEventListener('click', function(){
 });
 if (!KEY) showGate(); else loadFonts();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(function(){});
+/* an app on the iPhone home screen resumes instead of reloading, so it checks for a new version itself:
+   on open and whenever it comes back to the screen. Never while a note is being typed, once per version. */
+var BUILD = '101a87180b';
+function checkUpdate(){
+  fetch('./version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.ok ? r.text() : ''; }).then(function(v){
+    v = String(v || '').trim(); if (!v || v === BUILD) return;
+    if (document.querySelector('.card.noting')) return;
+    try { if (sessionStorage.getItem('connecta_reloaded') === v) return; sessionStorage.setItem('connecta_reloaded', v); } catch (e) {}
+    location.replace('./?v=' + v);
+  }).catch(function(){});
+}
+checkUpdate();
+document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible') checkUpdate(); });
 </script>
 <script>
 if (!KEY) { /* app starts after sign-in reload */ }
