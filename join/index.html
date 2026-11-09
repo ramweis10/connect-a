@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>נרשמים למאגר של קונקטה</title>
+<meta name="description" content="שתי דקות מהטלפון, ואתם במאגר של קונקטה">
+<meta property="og:title" content="נרשמים למאגר של קונקטה">
+<meta property="og:description" content="שתי דקות מהטלפון, ואתם במאגר של קונקטה">
+<meta property="og:image" content="https://ramweis10.github.io/connect-a/icons/icon-512.png">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#1c1c1c">
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<!-- Public page: the licensed Simpler fonts are never served here, so it uses the phone's own system font. -->
+<style>
+:root{--bg:#1c1c1c;--ink:#f2efe8;--dim:#8a8780;--line:rgba(242,239,232,.14);--line2:rgba(242,239,232,.55);
+--terra:#e0694a;--green:#3c7a62;--sky:#4eb2d6;--olive:#c4c43a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:-apple-system,system-ui,"Segoe UI",Arial,sans-serif;font-size:17px;line-height:1.45;
+  padding:calc(28px + env(safe-area-inset-top)) 0 calc(60px + env(safe-area-inset-bottom))}
+.wrap{max-width:520px;margin:0 auto;padding:0 20px}
+.wordmark{height:16px;filter:invert(1);opacity:.95;display:block}
+h1{font-size:30px;line-height:1.15;margin:34px 0 8px;font-weight:700;letter-spacing:-.01em}
+.lead{color:var(--dim);margin:0 0 30px}
+.sec{border-top:1px solid var(--line2);padding-top:14px;margin-top:30px}
+.sec h2{font-size:14px;font-weight:600;color:var(--dim);margin:0 0 4px}
+.sec .hint{font-size:14px;color:var(--dim);margin:0 0 8px}
+label.f{display:block;margin-top:18px;font-size:15px;color:var(--dim)}
+label.f b{color:var(--terra);font-weight:400}
+input[type=text],input[type=tel],input[type=url],textarea{width:100%;background:none;border:0;border-bottom:1.5px solid var(--line2);
+  color:var(--ink);font:inherit;font-size:19px;padding:8px 0;outline:0;border-radius:0}
+input:focus,textarea:focus{border-bottom-color:var(--ink)}
+input::placeholder,textarea::placeholder{color:rgba(242,239,232,.3)}
+textarea{resize:none;min-height:64px}
+input[type=tel]{direction:ltr;text-align:right}
+.grp{margin-top:18px}
+.grp .gt{font-size:13px;color:var(--dim);margin-bottom:2px}
+.opt{display:flex;align-items:flex-start;gap:12px;width:100%;background:none;border:0;border-bottom:1px solid var(--line);
+  color:var(--ink);font:inherit;text-align:right;padding:12px 0;cursor:pointer}
+.opt .bead{flex:none;width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line2);margin-top:5px}
+.opt.on .bead{background:var(--terra);border-color:var(--terra)}
+.opt .t{display:block;font-size:17px}
+.opt .s{display:block;font-size:14px;color:var(--dim);margin-top:1px}
+.opt.off{opacity:.35}
+#otherBox{display:none;margin-top:6px}
+#otherBox.show{display:block}
+.consent{display:flex;gap:12px;align-items:flex-start;margin-top:30px;font-size:15px;cursor:pointer}
+.consent input{position:absolute;opacity:0;pointer-events:none}
+.consent .box{flex:none;width:20px;height:20px;border:1.5px solid var(--line2);margin-top:2px;position:relative}
+.consent input:checked + .box{background:var(--ink);border-color:var(--ink)}
+.consent input:checked + .box:after{content:"";position:absolute;right:6px;top:2px;width:5px;height:10px;border:solid var(--bg);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.hp{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);opacity:0}
+#go{margin-top:30px;border:1.2px solid var(--ink);border-radius:999px;background:var(--ink);color:var(--bg);font:inherit;
+  font-size:18px;font-weight:600;padding:12px 34px;cursor:pointer}
+#go[disabled]{opacity:.5}
+#err{color:var(--terra);font-size:15px;min-height:22px;margin-top:12px}
+#done{display:none}
+#done h1{margin-top:60px}
+#done .bead{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--olive);margin-left:8px;vertical-align:middle}
+.small{font-size:13px;color:var(--dim);margin-top:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img class="wordmark" src="../icons/wordmark.png" alt="קונקטה">
+
+  <form id="form" novalidate>
+    <h1>נרשמים למאגר של קונקטה</h1>
+    <p class="lead">שתי דקות מהטלפון. מה אתם עושים, איפה אתם, ואיפה רואים את העבודה שלכם.</p>
+
+    <label class="f" for="name">שם מלא <b>*</b></label>
+    <input type="text" id="name" autocomplete="name" maxlength="80">
+
+    <label class="f" for="phone">נייד <b>*</b></label>
+    <input type="tel" id="phone" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="050-0000000">
+
+    <div class="sec">
+      <h2>מה אתם עושים? <b style="color:var(--terra);font-weight:400">*</b></h2>
+      <p class="hint">אפשר לבחור עד שניים</p>
+      <div id="cats"></div>
+      <div id="otherBox"><input type="text" id="other" maxlength="60" placeholder="מה בדיוק?"></div>
+    </div>
+
+    <label class="f" for="desc">במילים שלכם</label>
+    <textarea id="desc" maxlength="300" placeholder="למשל: תקליטן חתונות ומסיבות, ציוד משלי"></textarea>
+
+    <label class="f" for="city">עיר</label>
+    <input type="text" id="city" autocomplete="address-level2" maxlength="40" placeholder="ירושלים">
+
+    <label class="f" for="link">קישור לאינסטגרם, לאתר או לתיק עבודות</label>
+    <input type="url" id="link" inputmode="url" autocapitalize="none" maxlength="200" placeholder="instagram.com/...">
+
+    <div class="hp" aria-hidden="true"><input type="text" id="web" tabindex="-1" autocomplete="off"></div>
+
+    <label class="consent">
+      <input type="checkbox" id="consent">
+      <span class="box"></span>
+      <span>אני מסכים/ה שקונקטה תשמור את הפרטים ותפנה אליי לעבודות</span>
+    </label>
+
+    <button type="submit" id="go">שליחה</button>
+    <div id="err"></div>
+  </form>
+
+  <div id="done">
+    <h1><span class="bead"></span>תודה, <span id="doneName"></span></h1>
+    <p class="lead">הפרטים שלכם אצלנו, במאגר של קונקטה.</p>
+  </div>
+
+  <p class="small">קונקטה · ירושלים</p>
+</div>
+
+<script>
+var API_URL = 'https://script.google.com/macros/s/AKfycbwi2DKWb5Zk756iFTRZSvMiqGt9icxy4hDqyXngnrBcWaOSjN4YIJTeLsO4Om16wqm1/exec';
+// value = the category name in the maagar (do not change, the app searches by it); t = what the form shows; s = hint
+var GROUPS = [
+  ['צוות ושטח', [
+    { v: 'הפקה', t: 'מפיק/ה', s: 'מנהל/ת אירוע או פרויקט מהתחלה עד הסוף: תקציב, ספקים, לוח זמנים' },
+    { v: 'עוזרי הפקה וצוות שטח', t: 'צוות הפקה ושטח', s: 'הקמות, פירוקים, ריצות, עזרה ביום האירוע' },
+    { v: 'בר ושתייה', t: 'בר ושתייה' },
+    { v: 'אבטחה וסדרנות', t: 'אבטחה וסדרנות' },
+    { v: 'ניהול במה וטכני', t: 'ניהול במה וטכני' },
+    { v: 'הגברה ותאורה', t: 'הגברה ותאורה' }
+  ]],
+  ['במה ויצירה', [
+    { v: 'מוזיקה והופעות', t: 'מוזיקה והופעות' },
+    { v: "דיג'יי", t: "דיג'יי" },
+    { v: 'תיאטרון ופרפורמנס', t: 'תיאטרון ופרפורמנס' },
+    { v: 'מחול', t: 'מחול' },
+    { v: 'הנחיה', t: 'הנחיה' },
+    { v: 'סדנאות', t: 'סדנאות' },
+    { v: 'ילדים ונוער', t: 'ילדים ונוער' }
+  ]],
+  ['תיעוד ועיצוב', [
+    { v: 'צילום', t: 'צילום' },
+    { v: 'קולנוע ומדיה', t: 'קולנוע ומדיה' },
+    { v: 'עיצוב גרפי ומיתוג', t: 'עיצוב גרפי ומיתוג' },
+    { v: 'יחצ ושיווק', t: 'יח״צ ושיווק' },
+    { v: 'אמנות חזותית', t: 'אמנות חזותית' }
+  ]],
+  ['', [ { v: '__other', t: 'משהו אחר' } ]]
+];
+var picked = [], T0 = Date.now();
+var catsEl = document.getElementById('cats');
+GROUPS.forEach(function (g) {
+  var d = document.createElement('div'); d.className = 'grp';
+  if (g[0]) { var h = document.createElement('div'); h.className = 'gt'; h.textContent = g[0]; d.appendChild(h); }
+  g[1].forEach(function (o) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'opt'; b.dataset.v = o.v;
+    b.innerHTML = '<span class="bead"></span><span><span class="t"></span>' + (o.s ? '<span class="s"></span>' : '') + '</span>';
+    b.querySelector('.t').textContent = o.t; if (o.s) b.querySelector('.s').textContent = o.s;
+    b.addEventListener('click', function () { toggle(o.v); });
+    d.appendChild(b);
+  });
+  catsEl.appendChild(d);
+});
+function toggle(v) {
+  var i = picked.indexOf(v);
+  if (i >= 0) picked.splice(i, 1); else if (picked.length < 2) picked.push(v); else return;
+  document.querySelectorAll('.opt').forEach(function (b) {
+    var on = picked.indexOf(b.dataset.v) >= 0;
+    b.classList.toggle('on', on); b.classList.toggle('off', !on && picked.length >= 2);
+  });
+  var showOther = picked.indexOf('__other') >= 0;
+  document.getElementById('otherBox').classList.toggle('show', showOther);
+  if (showOther) document.getElementById('other').focus();
+  err('');
+}
+function val(id) { return document.getElementById(id).value.trim(); }
+function err(m) { document.getElementById('err').textContent = m || ''; }
+document.getElementById('form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var phone = val('phone').replace(/\D/g, '').replace(/^972/, '0');
+  if (val('name').length < 2) return err('חסר שם');
+  if (!/^05\d{8}$/.test(phone)) return err('מספר הנייד לא נראה תקין');
+  var cats = picked.filter(function (v) { return v !== '__other'; });
+  var other = picked.indexOf('__other') >= 0 ? val('other') : '';
+  if (!cats.length && !other) return err(picked.length ? 'כתבו מה בדיוק אתם עושים' : 'בחרו מה אתם עושים');
+  if (!document.getElementById('consent').checked) return err('צריך לסמן את האישור כדי להירשם');
+  var go = document.getElementById('go'); go.disabled = true; go.textContent = 'שולח...'; err('');
+  var f = { name: val('name'), phone: phone, cats: cats, other: other, desc: val('desc'), city: val('city'),
+            link: val('link'), consent: true, web: val('web'), t: T0 };
+  fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ api: 'join', f: f }) })
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (j && j.ok) {
+        document.getElementById('doneName').textContent = val('name').split(/\s+/)[0];
+        document.getElementById('form').style.display = 'none';
+        document.getElementById('done').style.display = 'block';
+        window.scrollTo(0, 0);
+      } else { throw new Error(j && j.message || 'משהו השתבש, נסו שוב'); }
+    })
+    .catch(function (x) {
+      go.disabled = false; go.textContent = 'שליחה';
+      err(x && x.message && !/fetch|network|JSON/i.test(x.message) ? x.message : 'אין חיבור כרגע, נסו שוב');
+    });
+});
+</script>
+</body>
+</html>

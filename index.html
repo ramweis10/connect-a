@@ -52,7 +52,7 @@ header{padding:20px 0 6px;display:flex;align-items:center;justify-content:space-
 /* results: a hairline per card with a bead on it, colored by how well we know the person */
 .card{position:relative;padding:16px 0 14px;border-top:1px solid var(--line2)}
 .card:before{content:"";position:absolute;right:0;top:-5px;width:9px;height:9px;border-radius:50%;background:var(--dim)}
-.card.l3:before{background:var(--green)} .card.l2:before{background:var(--sky)}
+.card.l3:before{background:var(--green)} .card.l2:before{background:var(--sky)} .card.l4:before{background:var(--olive)}
 .card:last-child{border-bottom:1px solid var(--line2)}
 .head{display:flex;align-items:center;gap:12px;cursor:pointer}
 .who{flex:1;min-width:0}
@@ -158,6 +158,7 @@ header{padding:20px 0 6px;display:flex;align-items:center;justify-content:space-
         <button class="ftog" data-k="level" data-v="עבד איתנו" style="--bead:var(--green)">עבדו איתנו</button>
         <button class="ftog" data-k="level" data-v="המלצת מפיק" style="--bead:var(--sky)">המלצות</button>
         <button class="ftog" data-k="city" data-v="ירושלים" style="--bead:var(--terra)">ירושלים</button>
+        <button class="ftog" data-k="level" data-v="נרשם לבד" style="--bead:var(--olive)" id="fNew">חדשים</button>
       </div>
     </div>
     <div class="catwrap"><div class="cats" id="cats"></div></div>
@@ -238,7 +239,7 @@ if (!KEY) showGate(); else loadFonts();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(function(){});
 /* an app on the iPhone home screen resumes instead of reloading, so it checks for a new version itself:
    on open and whenever it comes back to the screen. Never while a note is being typed, once per version. */
-var BUILD = '101a87180b';
+var BUILD = 'b0aa3ebce2';
 function checkUpdate(){
   fetch('./version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.ok ? r.text() : ''; }).then(function(v){
     v = String(v || '').trim(); if (!v || v === BUILD) return;
@@ -355,10 +356,11 @@ function score(r, toks, budget){
   return {s:s, why:why};
 }
 
-function levelClass(l){ return l==='עבד איתנו'?'l3':(l==='המלצת מפיק'?'l2':'l1'); }
+function levelClass(l){ return l==='עבד איתנו'?'l3':(l==='המלצת מפיק'?'l2':(l==='נרשם לבד'?'l4':'l1')); }
 function levelText(r){
   if (r.level==='עבד איתנו') return r.n ? 'עבד איתנו '+r.n+(r.n===1?' פעם':' פעמים') : 'עבד איתנו';
   if (r.level==='המלצת מפיק') return 'המלצה' + (r.rec ? ' של '+r.rec.split(',')[0].trim() : '');
+  if (r.level==='נרשם לבד') return 'נרשם לבד' + (r.upd ? ' · ' + r.upd.split('-').reverse().slice(0,2).join('.') : '');
   return 'רשימת קשר';
 }
 function esc(s){ return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
@@ -366,7 +368,13 @@ function waLink(p){ var d=String(p||'').split('/')[0].replace(/\D/g,''); if(!d) 
 function telLink(p){ var d=String(p||'').split('/')[0].replace(/[^\d+]/g,''); return d?'tel:'+d:''; }
 function starsTxt(n){ n=Math.round(n); return '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n); }
 
+function markNew(){ // "חדשים" = people who signed up through the public form, counted on the current tab; hidden when none
+  var b = document.getElementById('fNew'); if (!b) return;
+  var n = 0; for (var i=0;i<DATA.length;i++) if (DATA[i].level==='נרשם לבד' && sideOf(DATA[i])===state.side) n++;
+  b.textContent = 'חדשים' + (n ? ' ' + n : ''); b.style.display = (n || state.level==='נרשם לבד') ? '' : 'none';
+}
 function render(){
+  markNew();
   var toks = tokens(state.q), budget = budgetOf(state.q);
   var list = [];
   for (var i=0;i<DATA.length;i++){

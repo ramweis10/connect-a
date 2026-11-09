@@ -1,5 +1,5 @@
 // Connect.a: cache the app shell so it opens instantly and offline. Data and API calls are never cached here.
-var V = 'connecta-shell-101a87180b';
+var V = 'connecta-shell-b0aa3ebce2';
 var SHELL = ['./', './index.html', './manifest.webmanifest', './icons/apple-touch-icon.png', './icons/icon-192.png', './icons/icon-512.png', './icons/wordmark.png'];
 self.addEventListener('install', function(e){ e.waitUntil(caches.open(V).then(function(c){ return c.addAll(SHELL); })); self.skipWaiting(); });
 self.addEventListener('activate', function(e){ e.waitUntil(caches.keys().then(function(ks){ return Promise.all(ks.filter(function(k){ return k !== V; }).map(function(k){ return caches.delete(k); })); })); self.clients.claim(); });
