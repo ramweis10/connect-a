@@ -36,7 +36,7 @@ header{padding:20px 0 6px;display:flex;align-items:center;justify-content:space-
 .q input::-webkit-search-cancel-button{display:none}
 .q button{background:none;border:0;color:var(--dim);font:inherit;font-size:24px;line-height:1;cursor:pointer;padding:0 2px;visibility:hidden}
 .q.has button{visibility:visible}
-.filters{display:flex;gap:6px 20px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.filters{display:flex;gap:6px 20px;flex-wrap:wrap;margin-top:10px;align-items:center}
 .fgroup{display:flex;gap:16px;align-items:center}
 .fgroup + .fgroup{padding-right:20px;border-right:1px solid var(--line)}
 .ftog{font:inherit;font-size:15px;color:var(--dim);background:none;border:0;padding:6px 0 8px;cursor:pointer;position:relative;white-space:nowrap}
@@ -47,6 +47,7 @@ header{padding:20px 0 6px;display:flex;align-items:center;justify-content:space-
 .cats{display:flex;gap:18px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;padding-left:36px}
 .cats::-webkit-scrollbar{display:none}
 .cats .ftog{flex:0 0 auto;font-size:14px}
+.xside{display:block;width:100%;margin:18px 0 0;padding:14px 0;background:none;border:0;border-top:1px dashed var(--line2);color:var(--ink);font:inherit;font-size:15px;text-align:right;cursor:pointer}
 .count{font-family:"SimplerMono",monospace;font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:.06em}
 /* results: a hairline per card with a bead on it, colored by how well we know the person */
 .card{position:relative;padding:16px 0 14px;border-top:1px solid var(--line2)}
@@ -144,27 +145,18 @@ header{padding:20px 0 6px;display:flex;align-items:center;justify-content:space-
     </div>
     <div class="hello" id="hello"></div>
   </header>
-  <nav class="views"><button class="vtab on" data-view="m">מאגר</button><button class="vtab" data-view="e">אירועים</button></nav>
+  <nav class="views"><button class="vtab on" data-view="s">ספקים</button><button class="vtab" data-view="t">תכנים</button><button class="vtab" data-view="e">אירועים</button></nav>
   <div id="viewM">
 
   <div class="search">
     <div class="q">
-      <input id="q" type="search" placeholder="מי מכיר... דיג'יי לשוק, עד 2,000" autocomplete="off" enterkeyhint="search">
+      <input id="q" type="search" placeholder="מה צריך? הגברה לשוק, עד 2,000" autocomplete="off" enterkeyhint="search">
       <button id="clear" title="נקה">×</button>
     </div>
     <div class="filters">
-      <div class="fgroup" id="ftype">
-        <button class="ftog" data-k="type" data-v="">הכל</button>
-        <button class="ftog" data-k="type" data-v="אמן" style="--bead:var(--mauve)">אמנים</button>
-        <button class="ftog" data-k="type" data-v="ספק" style="--bead:var(--indigo)">ספקים</button>
-        <button class="ftog" data-k="type" data-v="צוות" style="--bead:var(--olive)">צוות</button>
-        <button class="ftog" data-k="type" data-v="מקום" style="--bead:var(--sky)">מקומות</button>
-      </div>
-      <div class="fgroup" id="flevel">
+      <div class="fgroup">
         <button class="ftog" data-k="level" data-v="עבד איתנו" style="--bead:var(--green)">עבדו איתנו</button>
         <button class="ftog" data-k="level" data-v="המלצת מפיק" style="--bead:var(--sky)">המלצות</button>
-      </div>
-      <div class="fgroup">
         <button class="ftog" data-k="city" data-v="ירושלים" style="--bead:var(--terra)">ירושלים</button>
       </div>
     </div>
@@ -248,7 +240,11 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 <script>
 if (!KEY) { /* app starts after sign-in reload */ }
 var DATA = [], PROJECTS = [], ME = {name: ''};
-var state = {q: '', type: '', level: '', city: '', cat: ''};
+var state = {q: '', side: 's', level: '', city: '', cat: ''};
+/* two sides of the maagar: content (what the audience sees) vs suppliers (what makes it happen), by primary category */
+var CONTENT_CATS = {"מוזיקה והופעות":1,"דיג'יי":1,"אמנות חזותית":1,"תיאטרון ופרפורמנס":1,"הרצאות ופאנלים":1,"כתיבה ותוכן":1,"ילדים ונוער":1,"סדנאות":1,"הנחיה":1,"מחול":1,"קולנוע ומדיה":1,"בלונים ואטרקציות":1,"דוכנים ושוק":1};
+var PH = {s: "מה צריך? הגברה לשוק, עד 2,000", t: "מה צריך? להקה לערב קהילה"};
+function sideOf(r){ if (r._side) return r._side; var c = String(r.cat||'').split(';')[0].trim(); r._side = c ? (CONTENT_CATS[c]?'t':'s') : (r.type==='אמן'?'t':'s'); return r._side; }
 
 /* ---------- synonyms: a query word matches any word in its group ---------- */
 var SYN = [
@@ -362,7 +358,7 @@ function render(){
   var list = [];
   for (var i=0;i<DATA.length;i++){
     var r = DATA[i];
-    if (state.type && r.type!==state.type) continue;
+    if (sideOf(r)!==state.side) continue;
     if (state.level && r.level!==state.level) continue;
     if (state.cat && String(r.cat||'').indexOf(state.cat)<0) continue;
     if (state.city && norm(r.city).indexOf(norm(state.city))<0 && norm(r.notes+' '+r.fields).indexOf('ירושל')<0) continue;
@@ -371,15 +367,23 @@ function render(){
   }
   list.sort(function(a,b){ return b.s-a.s || (a.r.name>b.r.name?1:-1); });
   var total = list.length; list = list.slice(0, toks.core.length?30:60);
-  document.getElementById('count').textContent = total ? (total + ' תוצאות' + (total>list.length?', מוצגות '+list.length+' הראשונות':'')) : '';
+  var filtering = toks.core.length || state.cat || state.level || state.city;
+  document.getElementById('count').textContent = (filtering && total) ? total + ' תוצאות' : '';
   var box = document.getElementById('results');
   // remember which cards the user opened, so a background refresh does not close them
   var open = {}; box.querySelectorAll('.card.open').forEach(function(c){ open[c.id] = c.classList.contains('noting') ? 2 : 1; });
-  if (!total){ box.innerHTML = '<div class="empty">לא נמצא. נסה מילה אחרת, או הסר מסנן.</div>'; return; }
-  box.innerHTML = list.map(function(it){ return card(it.r,it.why); }).join('');
+  var other = (toks.core.length && total < 5) ? countOther(toks, budget) : 0;
+  var hint = other ? '<button class="xside" onclick="setView(\''+(state.side==='s'?'t':'s')+'\')">'+other+' תוצאות ב'+(state.side==='s'?'תכנים':'ספקים')+' ←</button>' : '';
+  if (!total){ box.innerHTML = hint || '<div class="empty">לא נמצא. נסה מילה אחרת, או הסר מסנן.</div>'; return; }
+  box.innerHTML = list.map(function(it){ return card(it.r,it.why); }).join('') + hint;
   Object.keys(open).forEach(function(id){ var c = document.getElementById(id); if (c){ c.classList.add('open'); if (open[id]===2) c.classList.add('noting'); } });
 }
 
+function countOther(toks, budget){
+  var n = 0; for (var i=0;i<DATA.length;i++){ var r=DATA[i]; if (sideOf(r)===state.side) continue;
+    if (state.level && r.level!==state.level) continue;
+    if (score(r,toks,budget)) n++; } return n;
+}
 function card(r, why){
   var fields = String(r.fields||'').split(';').map(function(x){return x.trim();}).filter(Boolean);
   var cat1 = String(r.cat||'').split(';')[0].trim();
@@ -482,11 +486,10 @@ function saveNote(id){
   }).withFailureHandler(function(err){ toast('שגיאה: '+(err.message||err)); }).api_addNote(note);
 }
 
-/* ---------- boot ---------- */
-function boot(rows){
-  DATA = rows;
-  var counts = {}; rows.forEach(function(r){ String(r.cat||'').split(';').forEach(function(c){ c=c.trim(); if(c) counts[c]=(counts[c]||0)+1; }); });
-  var names = Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; });
+/* ---------- categories of the current side ---------- */
+function buildCats(){
+  var counts = {}; DATA.forEach(function(r){ if (sideOf(r)!==state.side) return; var c = String(r.cat||'').split(';')[0].trim(); if(c) counts[c]=(counts[c]||0)+1; });
+  var names = Object.keys(counts).filter(function(c){ return counts[c]>=4; }).sort(function(a,b){ return counts[b]-counts[a]; });
   var box = document.getElementById('cats');
   box.innerHTML = names.map(function(c){ return '<button class="ftog" data-k="cat" data-v="'+esc(c)+'">'+esc(c)+'</button>'; }).join('');
   box.querySelectorAll('.ftog').forEach(function(b){ b.addEventListener('click', function(){
@@ -494,6 +497,12 @@ function boot(rows){
     box.querySelectorAll('.ftog').forEach(function(x){ x.classList.toggle('on', x.dataset.v===state.cat); });
     render(); window.scrollTo(0,0);
   }); });
+}
+
+/* ---------- boot ---------- */
+function boot(rows){
+  DATA = rows;
+  buildCats();
   render();
   var dl = document.createElement('datalist'); dl.id='projects'; document.body.appendChild(dl);
   google.script.run.withSuccessHandler(function(ps){ PROJECTS=ps||[]; dl.innerHTML = PROJECTS.map(function(p){return '<option value="'+esc(p)+'">';}).join(''); }).api_getProjects();
@@ -514,19 +523,17 @@ if (KEY) google.script.run.withSuccessHandler(function(me){ ME=me; document.getE
 var qEl = document.getElementById('q'), timer=null;
 qEl.addEventListener('input', function(){ qEl.parentNode.classList.toggle('has', !!qEl.value); clearTimeout(timer); timer=setTimeout(function(){ state.q=qEl.value; render(); window.scrollTo(0,0); },180); });
 document.getElementById('clear').addEventListener('click', function(){ qEl.value=''; qEl.parentNode.classList.remove('has'); state.q=''; render(); qEl.focus(); });
-document.querySelectorAll('.ftog').forEach(function(b){
+document.querySelectorAll('.filters .ftog').forEach(function(b){
   b.addEventListener('click', function(){
     var k=b.dataset.k, v=b.dataset.v;
     state[k] = (state[k]===v && v!=='') ? '' : v;
     document.querySelectorAll('.ftog[data-k="'+k+'"]').forEach(function(x){ x.classList.toggle('on', x.dataset.v===state[k] && !(x.dataset.v==='' && state[k]==='') ); });
-    if (k==='type' && state.type==='') document.querySelector('.ftog[data-k="type"][data-v=""]').classList.add('on');
     render();
   });
 });
-document.querySelector('.ftog[data-k="type"][data-v=""]').classList.add('on');
 
 /* ---------- events board ---------- */
-var EVENTS = null, VIEW = 'm';
+var EVENTS = null, VIEW = 's';
 var HEB_DAYS = ['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];
 var HEB_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
 function personClass(s){ s=String(s||''); if(s.indexOf('לוטם')>=0) return 'p-lotem'; if(s.indexOf('מיטל')>=0) return 'p-meital'; if(/^רם(\s|$)/.test(s)) return 'p-ram'; return s&&s!=='פתוח'?'p-other':''; }
@@ -563,7 +570,11 @@ function loadEvents(){
 }
 function setView(v){
   VIEW=v; document.querySelectorAll('.vtab').forEach(function(b){ b.classList.toggle('on', b.dataset.view===v); });
-  document.getElementById('viewM').hidden = v!=='m'; document.getElementById('viewE').hidden = v!=='e';
+  document.getElementById('viewM').hidden = v==='e'; document.getElementById('viewE').hidden = v!=='e';
+  if (v!=='e' && v!==state.side){
+    state.side=v; state.cat=''; qEl.placeholder=PH[v];
+    if (DATA.length){ buildCats(); render(); }
+  }
   try{ localStorage.setItem('connecta_view', v); }catch(e){}
   if (v==='e' && EVENTS===null) loadEvents();
   window.scrollTo(0,0);
@@ -571,7 +582,7 @@ function setView(v){
 document.querySelectorAll('.vtab').forEach(function(b){ b.addEventListener('click', function(){ setView(b.dataset.view); }); });
 
 if (KEY) load(false);
-try{ if(KEY && localStorage.getItem('connecta_view')==='e') setView('e'); }catch(e){}
+try{ var v0=localStorage.getItem('connecta_view'); if(KEY && (v0==='t'||v0==='e')) setView(v0); }catch(e){}
 </script>
 </body>
 </html>
