@@ -1,0 +1,501 @@
+<!doctype html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1c1c1c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Connect.a</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-title" content="Connect.a">
+
+<style>
+:root{--bg:#1c1c1c;--ink:#f2efe8;--dim:#8a8780;--line:rgba(242,239,232,.14);--line2:rgba(242,239,232,.55);
+--terra:#e0694a;--indigo:#5b4fd6;--green:#3c7a62;--sky:#4eb2d6;--mauve:#c58a98;--olive:#c4c43a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Simpler",sans-serif;font-size:17px;line-height:1.45;min-height:100%}
+body{background-image:repeating-linear-gradient(to bottom,transparent 0 31px,var(--line) 31px 32px);background-attachment:scroll}
+.mono{font-family:"SimplerMono",monospace;font-size:12px;letter-spacing:.06em;color:var(--dim)}
+.wrap{max-width:680px;margin:0 auto;padding:0 18px 90px}
+/* header */
+header{padding:20px 0 6px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px}
+.wordmark{height:15px;filter:invert(1);opacity:.95}
+.appname{font-family:"SimplerMono",monospace;font-size:12px;letter-spacing:.1em;color:var(--dim);display:flex;align-items:center;gap:7px}
+.appname:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--terra)}
+.hello{font-size:14px;color:var(--dim)}
+/* search, sticky with a solid surface so cards never show through */
+.search{position:sticky;top:0;background:var(--bg);padding:12px 0 10px;z-index:5;box-shadow:0 1px 0 var(--line)}
+.q{display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--line2);padding:4px 0 8px;position:relative}
+.q:after{content:"";position:absolute;right:0;bottom:-6px;width:11px;height:11px;border-radius:50%;background:var(--terra)}
+.q input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--ink);font:inherit;font-size:21px;padding:4px 0;-webkit-appearance:none;appearance:none}
+.q input::placeholder{color:var(--dim)}
+.q input::-webkit-search-cancel-button{display:none}
+.q button{background:none;border:0;color:var(--dim);font:inherit;font-size:24px;line-height:1;cursor:pointer;padding:0 2px;visibility:hidden}
+.q.has button{visibility:visible}
+.filters{display:flex;gap:6px 20px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.fgroup{display:flex;gap:16px;align-items:center}
+.fgroup + .fgroup{padding-right:20px;border-right:1px solid var(--line)}
+.ftog{font:inherit;font-size:15px;color:var(--dim);background:none;border:0;padding:6px 0 8px;cursor:pointer;position:relative;white-space:nowrap}
+.ftog.on{color:var(--ink)}
+.ftog.on:after{content:"";position:absolute;right:50%;transform:translateX(50%);bottom:0;width:7px;height:7px;border-radius:50%;background:var(--bead,var(--terra))}
+.catwrap{position:relative;margin-top:4px}
+.catwrap:after{content:"";position:absolute;left:0;top:0;bottom:0;width:36px;background:linear-gradient(to right,var(--bg),transparent);pointer-events:none}
+.cats{display:flex;gap:18px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;padding-left:36px}
+.cats::-webkit-scrollbar{display:none}
+.cats .ftog{flex:0 0 auto;font-size:14px}
+.count{font-family:"SimplerMono",monospace;font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:.06em}
+/* results: a hairline per card with a bead on it, colored by how well we know the person */
+.card{position:relative;padding:16px 0 14px;border-top:1px solid var(--line2)}
+.card:before{content:"";position:absolute;right:0;top:-5px;width:9px;height:9px;border-radius:50%;background:var(--dim)}
+.card.l3:before{background:var(--green)} .card.l2:before{background:var(--sky)}
+.card:last-child{border-bottom:1px solid var(--line2)}
+.head{display:flex;align-items:center;gap:12px;cursor:pointer}
+.who{flex:1;min-width:0}
+.name{font-weight:700;font-size:19px;line-height:1.25}
+.meta{color:var(--dim);font-size:14.5px;margin-top:3px;line-height:1.35}
+.sub{font-size:13px;color:var(--dim);margin-top:5px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.sub .lv{color:var(--ink);opacity:.85}
+.sub .num{font-family:"SimplerMono",monospace;font-size:12px;letter-spacing:.03em}
+.stars{color:var(--olive);letter-spacing:.05em;font-size:13px}
+.icons{display:flex;gap:8px;flex:0 0 auto}
+.ic{width:40px;height:40px;border-radius:50%;border:1.2px solid var(--line2);display:flex;align-items:center;justify-content:center;color:var(--ink);background:none;cursor:pointer;text-decoration:none;padding:0;transition:transform .2s}
+.ic svg{width:18px;height:18px}
+.ic.wa{border-color:var(--green)}
+.ic.plus{border-color:var(--line);color:var(--dim);font-size:22px;line-height:1}
+.card.open .ic.plus{transform:rotate(45deg);color:var(--ink);border-color:var(--line2)}
+.nophone{font-size:12.5px;color:var(--dim);white-space:nowrap}
+.why{font-size:13.5px;color:var(--dim);margin:0 0 8px}
+.why b{color:var(--terra);font-weight:400}
+.acts{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.btn{border:1.2px solid var(--line2);border-radius:999px;color:var(--ink);background:none;font:inherit;font-size:14px;padding:7px 18px;text-decoration:none;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.btn.p{border-color:var(--green)}
+.btn.ghost{border-color:var(--line);color:var(--dim)}
+.more{display:none;margin-top:14px;padding:12px 14px 4px 0;border-right:1.5px solid var(--line);font-size:14.5px}
+.card.open .more{display:block}
+.more .row{margin:0 0 7px;color:var(--ink);line-height:1.45}
+.more .row .k{display:block;font-size:12.5px;color:var(--dim);margin-bottom:1px}
+.more .row a{color:var(--ink)}
+.more .sec{font-size:12.5px;color:var(--dim);margin:12px 0 4px}
+.more .w{padding:6px 0;border-top:1px solid var(--line)}
+.more .w .p{color:var(--ink)}
+.more .w .d{color:var(--dim);font-size:13.5px}
+.note{padding:7px 0;border-top:1px dashed var(--line)}
+.note .h{font-family:"SimplerMono",monospace;font-size:11px;color:var(--dim);letter-spacing:.04em;margin-bottom:2px}
+.foot{font-family:"SimplerMono",monospace;font-size:10.5px;color:var(--dim);letter-spacing:.04em;margin-top:10px;opacity:.8}
+/* note form */
+.form{display:none;margin-top:12px;padding:12px 14px;border:1px solid var(--line)}
+.card.noting .form{display:block}
+.form label{display:block;font-size:12.5px;color:var(--dim);margin:10px 0 4px}
+.form input,.form textarea,.form select{width:100%;background:var(--bg);border:1px solid var(--line2);color:var(--ink);font:inherit;font-size:16px;padding:9px 10px;outline:0;border-radius:0;-webkit-appearance:none;appearance:none}
+.form textarea{min-height:70px;resize:vertical}
+.rate{display:flex;gap:6px;direction:ltr;justify-content:flex-end}
+.rate button{font-size:28px;background:none;border:0;color:var(--line2);cursor:pointer;padding:0 2px;line-height:1}
+.rate button.on{color:var(--olive)}
+.form .acts{justify-content:flex-start}
+.empty{padding:40px 0;color:var(--dim);text-align:center}
+.toast{position:fixed;bottom:22px;right:50%;transform:translateX(50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:15px;opacity:0;transition:.25s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+.btn.del{margin-right:auto}
+.btn.del.arm{border-color:var(--terra);color:var(--terra)}
+.toast.undo{pointer-events:auto;display:flex;gap:14px;align-items:center}
+.toast.undo button{background:none;border:0;font:inherit;font-weight:700;color:var(--bg);text-decoration:underline;cursor:pointer;padding:0}
+.loading{padding:60px 0;text-align:center;color:var(--dim)}
+.beads{position:fixed;left:18px;top:140px;display:flex;flex-direction:column;gap:140px;pointer-events:none;opacity:.85}
+.beads i{width:12px;height:12px;border-radius:50%;display:block}
+@media (max-width:860px){.beads{display:none}}
+@media (max-width:420px){.wrap{padding:0 16px 80px}.name{font-size:18px}.ic{width:38px;height:38px}.fgroup{gap:14px}.fgroup + .fgroup{padding-right:14px}.filters{gap:4px 14px}}
+</style>
+</head>
+<body>
+<div class="beads"><i style="background:var(--terra)"></i><i style="background:var(--indigo);width:20px;height:20px"></i><i style="background:var(--olive)"></i><i style="background:var(--sky);width:9px;height:9px"></i></div>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img class="wordmark" src="./icons/wordmark.png" alt="Connecta">
+      <span class="appname">Connect.a</span>
+    </div>
+    <div class="hello" id="hello"></div>
+  </header>
+
+  <div class="search">
+    <div class="q">
+      <input id="q" type="search" placeholder="מי מכיר... דיג'יי לשוק, עד 2,000" autocomplete="off" enterkeyhint="search">
+      <button id="clear" title="נקה">×</button>
+    </div>
+    <div class="filters">
+      <div class="fgroup" id="ftype">
+        <button class="ftog" data-k="type" data-v="">הכל</button>
+        <button class="ftog" data-k="type" data-v="אמן" style="--bead:var(--mauve)">אמנים</button>
+        <button class="ftog" data-k="type" data-v="ספק" style="--bead:var(--indigo)">ספקים</button>
+        <button class="ftog" data-k="type" data-v="צוות" style="--bead:var(--olive)">צוות</button>
+        <button class="ftog" data-k="type" data-v="מקום" style="--bead:var(--sky)">מקומות</button>
+      </div>
+      <div class="fgroup" id="flevel">
+        <button class="ftog" data-k="level" data-v="עבד איתנו" style="--bead:var(--green)">עבדו איתנו</button>
+        <button class="ftog" data-k="level" data-v="המלצת מפיק" style="--bead:var(--sky)">המלצות</button>
+      </div>
+      <div class="fgroup">
+        <button class="ftog" data-k="city" data-v="ירושלים" style="--bead:var(--terra)">ירושלים</button>
+      </div>
+    </div>
+    <div class="catwrap"><div class="cats" id="cats"></div></div>
+    <div class="count" id="count"></div>
+  </div>
+
+  <div id="results"><div class="loading">טוען את המאגר...</div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<style>
+#gate{position:fixed;inset:0;background:var(--bg);z-index:50;display:none;flex-direction:column;justify-content:center;padding:0 28px;gap:16px}
+#gate.show{display:flex}
+#gate img{width:72px;height:72px;border-radius:16px;margin-bottom:6px}
+#gate h1{font-size:26px;margin:0}
+#gate p{color:var(--dim);margin:0 0 6px;font-size:15px}
+#gate input{background:none;border:0;border-bottom:1.5px solid var(--line2);color:var(--ink);font:inherit;font-size:20px;padding:8px 0;outline:0;direction:ltr;text-align:right;border-radius:0}
+#gate button{align-self:flex-start;border:1.2px solid var(--ink);border-radius:999px;background:none;color:var(--ink);font:inherit;font-size:16px;padding:9px 22px;cursor:pointer}
+#gate .err{color:var(--terra);font-size:14px;min-height:20px}
+body{padding-top:env(safe-area-inset-top)}
+.search{top:0;padding-top:calc(12px + env(safe-area-inset-top))}
+</style>
+<div id="gate">
+  <img src="./icons/apple-touch-icon.png" alt="">
+  <h1>Connect.a</h1>
+  <p>קוד הכניסה האישי שקיבלת מרם</p>
+  <input id="gateKey" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ram-xxxxxx">
+  <button id="gateGo">כניסה</button>
+  <div class="err" id="gateErr"></div>
+</div>
+<script>
+var API_URL = 'https://script.google.com/macros/s/AKfycbwi2DKWb5Zk756iFTRZSvMiqGt9icxy4hDqyXngnrBcWaOSjN4YIJTeLsO4Om16wqm1/exec';
+var KEY = ''; try { KEY = localStorage.getItem('connecta_key') || ''; } catch (e) {}
+function apiCall(api, extra){
+  var body = Object.assign({ api: api, k: KEY }, extra || {});
+  return fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if (j.error === 'auth') { try{ localStorage.removeItem('connecta_key'); }catch(e){} showGate('הקוד לא תקין'); throw new Error('קוד לא תקין'); }
+      if (j.error) throw new Error(j.error);
+      return j.result;
+    });
+}
+// same interface as google.script.run, so the app code is identical to the Apps Script version
+function Runner(s, f){ this._s = s; this._f = f; }
+Runner.prototype.withSuccessHandler = function(fn){ return new Runner(fn, this._f); };
+Runner.prototype.withFailureHandler = function(fn){ return new Runner(this._s, fn); };
+Runner.prototype._go = function(p){ var s=this._s, f=this._f; p.then(function(r){ if(s) s(r); }, function(e){ if(f) f(e); }); };
+Runner.prototype.api_whoAmI = function(){ this._go(apiCall('me')); };
+Runner.prototype.api_getData = function(force){ this._go(apiCall('data', { force: !!force })); };
+Runner.prototype.api_getProjects = function(){ this._go(apiCall('projects')); };
+Runner.prototype.api_addNote = function(note){ this._go(apiCall('note', { note: note })); };
+Runner.prototype.api_setHidden = function(id, hide){ this._go(apiCall('hide', { id: id, hide: hide })); };
+window.google = { script: { run: new Runner() } };
+
+function injectFonts(a){
+  var css = '@font-face{font-family:"Simpler";font-weight:700;src:url(data:font/woff2;base64,'+a.bold+') format("woff2")}'
+          + '@font-face{font-family:"Simpler";font-weight:400;src:url(data:font/woff2;base64,'+a.reg+') format("woff2")}'
+          + '@font-face{font-family:"SimplerMono";font-weight:400;src:url(data:font/woff;base64,'+a.mono+') format("woff")}';
+  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+}
+function loadFonts(){
+  var a = null; try { a = JSON.parse(localStorage.getItem('connecta_fonts') || 'null'); } catch (e) {}
+  if (a) { injectFonts(a); return; }
+  apiCall('assets').then(function(x){ injectFonts(x); try { localStorage.setItem('connecta_fonts', JSON.stringify(x)); } catch (e) {} }).catch(function(){});
+}
+function showGate(msg){ document.getElementById('gate').classList.add('show'); document.getElementById('gateErr').textContent = msg || ''; }
+document.getElementById('gateGo').addEventListener('click', function(){
+  var v = document.getElementById('gateKey').value.trim(); if (!v) return;
+  KEY = v; document.getElementById('gateErr').textContent = 'בודק...';
+  apiCall('me').then(function(){ try { localStorage.setItem('connecta_key', v); } catch (e) {} location.reload(); })
+    .catch(function(){ showGate('הקוד לא תקין'); });
+});
+if (!KEY) showGate(); else loadFonts();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(function(){});
+</script>
+<script>
+if (!KEY) { /* app starts after sign-in reload */ }
+var DATA = [], PROJECTS = [], ME = {name: ''};
+var state = {q: '', type: '', level: '', city: '', cat: ''};
+
+/* ---------- synonyms: a query word matches any word in its group ---------- */
+var SYN = [
+  ["דיג'יי","דיגיי","דיג׳יי","dj","תקלוט","די ג'יי","דיג'י"],
+  ["הגברה","סאונד","הגבר","מגביר","טכני","sound"],
+  ["תאורה","תאורן","לדים","led"],
+  ["קייטרינג","אוכל","מגשי","כיבוד","ארוחת","פוד","שף","סנדוויצ","בייגל","קפה","בר"],
+  ["צלם","צילום","צלמת","וידאו","מגנטים","סטילס"],
+  ["אבטחה","מאבטח","מאבטחים","שומר","סדרן"],
+  ["הובלות","הובלה","מוביל","משאית","סבלים","מנוף"],
+  ["הסעות","הסעה","אוטובוס","מיניבוס","מונית","נהג"],
+  ["דפוס","הדפסה","שילוט","שלטים","רולאפ","חולצות"],
+  ["עיצוב","מעצב","מעצבת","גרפי","גרפיקה","מיתוג"],
+  ["מנחה","הנחיה","מנחת","הנחייה"],
+  ["הרצאה","מרצה","מרצים","הרצאות","דוברת","דובר"],
+  ["סדנה","סדנא","סדנאות","מנחה סדנה"],
+  ["מוזיקה","נגן","נגנים","להקה","הרכב","זמר","זמרת","הופעה","מופע"],
+  ["ילדים","מתנפחים","בלונים","בלונאי","ציורי פנים","קרקס","ליצן","ג'אגלינג"],
+  ["מקום","אולם","חלל","לוקיישן","מתחם","גלריה"],
+  ["ריהוט","כיסאות","שולחנות","השכרת ציוד","ציוד","אוהל","הצללה","במה","במות"],
+  ["עוזר","עוזרת","עוזר הפקה","ראנר","איש צוות","כוח אדם","צוות"],
+  ["מפיק","מפיקה","מפיק בפועל","הפקה"],
+  ["פרחים","שזירה","עציצים"],
+  ["יחצ","יח\"צ","שיווק","סושיאל","קמפיין","דוברות"],
+  ["כשר","כשרות","מהדרין","חלבי","בשרי"],
+  ["רישוי","בטיחות","כבאות","חשמל","בודק חשמל","קונסטרוקציה","מהנדס"]
+];
+var SYNMAP = {};
+SYN.forEach(function(g){ g.forEach(function(w){ SYNMAP[norm(w)] = g.map(norm); }); });
+var STOP = {"לאירוע":1,"אירוע":1,"צריך":1,"צריכה":1,"מחפש":1,"מחפשת":1,"עד":1,"של":1,"עם":1,"את":1,"ל":1,"בשביל":1,"משהו":1,"מישהו":1,"טוב":1,"טובה":1,"מומלץ":1,"מומלצת":1,"איש":1,"אשת":1,"ש\"ח":1,"שח":1,"לשבת":1,"ליום":1,"לערב":1,"אנשים":1,"איש":1};
+
+function norm(s){ return String(s||'').toLowerCase().replace(/(\d),(?=\d)/g,'$1').replace(/['׳״"`]/g,'').replace(/[\.,;:!?()\[\]\/\-\u05be]/g,' ').replace(/\s+/g,' ').trim(); }
+function stripPrefix(w){ // ל/ב/ו/ה/מ prefixes
+  if (w.length>3 && /^[לבוהמכש]/.test(w)) return w.slice(1); return w;
+}
+var SOFT = {"ירושלים":1,"ירושלמי":1,"ירושלמית":1,"תל אביב":1,"חיפה":1,"באר שבע":1,"מודיעין":1,"פתח תקווה":1,"כשר":1,"כשרות":1,"מהדרין":1,"חלבי":1,"בשרי":1,"טבעוני":1,"זול":1,"זולה":1,"יקר":1,"גדול":1,"קטן":1,"מיוחד":1,"מיוחדת":1};
+function tokens(q){
+  // returns {core:[...], soft:[...]}: core words must match, soft words only boost
+  var words=[]; norm(q).split(' ').forEach(function(w){
+    if(!w) return; if (/^\d[\d,]*$/.test(w) && w.replace(/\D/g,'').length>=3) return; // numbers = budget
+    if (STOP[w]) return; var s=stripPrefix(w); words.push({w:w, s:(s!==w && !STOP[s])?s:null});
+  });
+  var core=[], soft=[], unknown=[];
+  words.forEach(function(x){
+    var known = SYNMAP[x.w] || (x.s && SYNMAP[x.s]);
+    var isSoft = SOFT[x.w] || (x.s && SOFT[x.s]) || (known && SOFT[known[0]]);
+    if (isSoft) soft.push(x); else if (known) core.push(x); else unknown.push(x);
+  });
+  // known service words are the must-match core; unknown words (a project name, a venue) only boost
+  if (!core.length){ core = unknown; unknown = []; }
+  if (!core.length){ core = soft; soft = []; }
+  return {core:core, soft:soft.concat(unknown)};
+}
+function budgetOf(q){ var m = norm(q).replace(/,/g,'').match(/(\d{3,6})/); return m ? Number(m[1]) : 0; }
+function priceNum(p){ var m=String(p||'').replace(/,/g,'').match(/(\d{2,7})/); return m?Number(m[1]):0; }
+
+function expand(tok){ var g = SYNMAP[tok]; return g ? g : [tok]; }
+function hay(r){
+  if (!r._h) r._h = {
+    name: norm(r.name+' '+r.org), fields: norm(r.fields+' '+(r.cat||'')+' '+r.type+' '+r.content), city: norm(r.city),
+    rest: norm([r.projects,r.notes,r.rec,r.src,(r.works||[]).map(function(w){return w.p+' '+w.r}).join(' '),(r.userNotes||[]).map(function(n){return n.text}).join(' ')].join(' '))
+  }; return r._h;
+}
+function has(text, g){
+  if (g.length<=2) return (' '+text+' ').indexOf(' '+g+' ')>=0 || (' '+text+' ').indexOf(' '+g+',')>=0; // short words need boundaries
+  return text.indexOf(g)>=0;
+}
+function hitOf(h, x){
+  var forms = [x.w].concat(x.s?[x.s]:[]), hit = 0, where = '';
+  forms.forEach(function(f){ expand(f).forEach(function(g){
+    if (g.length<2) return;
+    var w = (g===f) ? 1 : 0.5; // the user's own word beats a synonym
+    if (has(h.name,g)){ if(hit<4*w){hit=4*w;where='שם';} }
+    else if (has(h.fields,g)){ if(hit<3*w){hit=3*w;where='תחום';} }
+    else if (has(h.city,g)){ if(hit<2*w){hit=2*w;where='עיר';} }
+    else if (has(h.rest,g)){ if(hit<1.2*w){hit=1.2*w;where='היסטוריה';} }
+  }); });
+  return {hit:hit, where:where};
+}
+function score(r, toks, budget){
+  var h = hay(r), s = 0, why = [];
+  for (var i=0;i<toks.core.length;i++){
+    var c = hitOf(h, toks.core[i]);
+    if (!c.hit) return null; // core words must land somewhere
+    s += c.hit; if (why.indexOf(c.where)<0) why.push(c.where);
+  }
+  for (var k=0;k<toks.soft.length;k++){
+    var d = hitOf(h, toks.soft[k]);
+    if (d.hit){ s += d.hit*0.8; if (why.indexOf(d.where)<0) why.push(d.where); }
+  }
+  if (r.level==='עבד איתנו') s += 3; else if (r.level==='המלצת מפיק') s += 1.5;
+  s += Math.min(r.n, 5)*0.2 + (r.avg?r.avg*0.3:0);
+  if (budget){ var p = priceNum(r.price); if (p && p > budget*1.25) s -= 2; else if (p && p <= budget) s += 0.8; }
+  if (r.phone) s += 0.3;
+  return {s:s, why:why};
+}
+
+function levelClass(l){ return l==='עבד איתנו'?'l3':(l==='המלצת מפיק'?'l2':'l1'); }
+function levelText(r){
+  if (r.level==='עבד איתנו') return r.n ? 'עבד איתנו '+r.n+(r.n===1?' פעם':' פעמים') : 'עבד איתנו';
+  if (r.level==='המלצת מפיק') return 'המלצה' + (r.rec ? ' של '+r.rec.split(',')[0].trim() : '');
+  return 'רשימת קשר';
+}
+function esc(s){ return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function waLink(p){ var d=String(p||'').split('/')[0].replace(/\D/g,''); if(!d) return ''; if(d.indexOf('972')===0) return 'https://wa.me/'+d; return 'https://wa.me/972'+d.replace(/^0/,''); }
+function telLink(p){ var d=String(p||'').split('/')[0].replace(/[^\d+]/g,''); return d?'tel:'+d:''; }
+function starsTxt(n){ n=Math.round(n); return '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n); }
+
+function render(){
+  var toks = tokens(state.q), budget = budgetOf(state.q);
+  var list = [];
+  for (var i=0;i<DATA.length;i++){
+    var r = DATA[i];
+    if (state.type && r.type!==state.type) continue;
+    if (state.level && r.level!==state.level) continue;
+    if (state.cat && String(r.cat||'').indexOf(state.cat)<0) continue;
+    if (state.city && norm(r.city).indexOf(norm(state.city))<0 && norm(r.notes+' '+r.fields).indexOf('ירושל')<0) continue;
+    if (toks.core.length){ var sc = score(r,toks,budget); if(!sc) continue; list.push({r:r,s:sc.s,why:sc.why}); }
+    else list.push({r:r,s:(r.level==='עבד איתנו'?3:(r.level==='המלצת מפיק'?1.5:0))+Math.min(r.n,6)*0.4,why:[]});
+  }
+  list.sort(function(a,b){ return b.s-a.s || (a.r.name>b.r.name?1:-1); });
+  var total = list.length; list = list.slice(0, toks.core.length?30:60);
+  document.getElementById('count').textContent = total ? (total + ' תוצאות' + (total>list.length?', מוצגות '+list.length+' הראשונות':'')) : '';
+  var box = document.getElementById('results');
+  // remember which cards the user opened, so a background refresh does not close them
+  var open = {}; box.querySelectorAll('.card.open').forEach(function(c){ open[c.id] = c.classList.contains('noting') ? 2 : 1; });
+  if (!total){ box.innerHTML = '<div class="empty">לא נמצא. נסה מילה אחרת, או הסר מסנן.</div>'; return; }
+  box.innerHTML = list.map(function(it){ return card(it.r,it.why); }).join('');
+  Object.keys(open).forEach(function(id){ var c = document.getElementById(id); if (c){ c.classList.add('open'); if (open[id]===2) c.classList.add('noting'); } });
+}
+
+function card(r, why){
+  var fields = String(r.fields||'').split(';').map(function(x){return x.trim();}).filter(Boolean);
+  var cat1 = String(r.cat||'').split(';')[0].trim();
+  var meta = [cat1, fields.slice(0, cat1?1:2).filter(function(f){ return f.toLowerCase()!==cat1.toLowerCase(); }).join(' · '), r.city].filter(Boolean).join(' · ');
+  var lvl = esc(levelText(r)) + (r.price ? ' · ' + esc(r.price) : '') + (r.avg ? ' · <span class="stars">' + starsTxt(r.avg) + '</span>' : '');
+  var whyTxt = why.length ? 'נמצא לפי <b>'+why.join(', ')+'</b>' : '';
+  var notesHtml = (r.userNotes||[]).map(function(n){
+    return '<div class="note"><div class="h">'+esc(n.who)+' · '+esc(n.d)+(n.project?' · '+esc(n.project):'')+(n.stars?' · '+starsTxt(n.stars):'')+'</div>'+esc(n.text||'')+'</div>';
+  }).join('');
+  // a work without its own price shows the person's last known price, marked with ~ (an estimate, not a record)
+  var worksHtml = (r.works||[]).map(function(w){ return '<div class="row"><b>'+esc(w.p)+'</b>'+(w.r?' · '+esc(w.r):'')+(w.price?' · '+esc(w.price):(r.price?' · <span title="מחיר אחרון ידוע, לא בהכרח בפרויקט הזה">~'+esc(r.price)+'</span>':''))+(w.how?' · '+esc(w.how):'')+'</div>'; }).join('');
+  var WA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 0 1-11.8 7L4 20l1.1-4A8 8 0 1 1 20 12z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.6-1.8-.8-.8.8a3.5 3.5 0 0 1-2.3-2.3l.8-.8-.8-1.8z"/></svg>';
+  var TEL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3.5l1.5 4-2 1.5a10 10 0 0 0 6.5 6.5l1.5-2 4 1.5V19a1.5 1.5 0 0 1-1.6 1.5A15.5 15.5 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4z"/></svg>';
+  var subParts = ['<span class="lv">'+esc(levelText(r))+'</span>'];
+  if (r.price) subParts.push('<span class="num">'+esc(r.price)+'</span>');
+  if (r.avg) subParts.push('<span class="stars">'+starsTxt(r.avg)+'</span>');
+  function row(k,v){ return v ? '<div class="row"><span class="k">'+k+'</span>'+v+'</div>' : ''; }
+  var worksRows = (r.works||[]).map(function(w){ return '<div class="w"><span class="p">'+esc(w.p)+'</span><div class="d">'+[w.r?esc(w.r):'', w.price?esc(w.price):(r.price?'~'+esc(r.price):''), w.how?esc(w.how):''].filter(Boolean).join(' · ')+'</div></div>'; }).join('');
+  return '<div class="card '+levelClass(r.level)+'" id="c-'+r.id+'">'+
+    '<div class="head" onclick="toggle(\''+r.id+'\')">'+
+      '<div class="who"><div class="name">'+esc(r.name)+'</div>'+
+        (meta?'<div class="meta">'+esc(meta)+'</div>':'')+
+        '<div class="sub">'+subParts.join('<span>·</span>')+'</div>'+
+      '</div>'+
+      '<div class="icons" onclick="event.stopPropagation()">'+
+        (r.phone?'<a class="ic wa" href="'+waLink(r.phone)+'" target="_blank" rel="noopener" aria-label="ווטסאפ">'+WA+'</a><a class="ic" href="'+telLink(r.phone)+'" aria-label="חיוג">'+TEL+'</a>':'<span class="nophone">אין טלפון</span>')+
+        '<button class="ic plus" onclick="toggle(\''+r.id+'\')" aria-label="עוד">+</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="more">'+
+      (whyTxt?'<div class="why">'+whyTxt+'</div>':'')+
+      row('תחומים', fields.length?esc(fields.join(' · ')):'')+
+      row('חברה', r.org&&r.org!==r.name?esc(r.org):'')+
+      row('טלפון', r.phone?esc(r.phone):'')+
+      row('מייל', r.email?esc(r.email):'')+
+      row('קישור', r.link?'<a href="'+esc(/^http/.test(r.link)?r.link:'https://'+r.link)+'" target="_blank" rel="noopener">'+esc(r.link.replace(/^https?:\/\/(www\.)?/,'').slice(0,46))+'</a>':'')+
+      row('המליצו', r.rec?esc(r.rec):'')+
+      row('תכנים', r.content?esc(r.content):'')+
+      row('הערות', r.notes?esc(r.notes):'')+
+      (worksRows?'<div class="sec">עבודות</div>'+worksRows:'')+
+      (notesHtml?'<div class="sec">הערות הצוות</div>'+notesHtml:'')+
+      '<div class="acts"><button class="btn" onclick="noteForm(\''+r.id+'\')">הערה / דירוג</button><button class="btn ghost del" id="del-'+r.id+'" onclick="hideRow(\''+r.id+'\')">לא רלוונטי</button></div>'+
+      '<div class="foot">'+esc(r.id)+(r.upd?' · עודכן '+esc(r.upd):'')+(r.src?' · '+esc(r.src):'')+'</div>'+
+    '</div>'+
+    '<div class="form" id="f-'+r.id+'">'+
+      '<label>דירוג</label><div class="rate" id="rate-'+r.id+'">'+[1,2,3,4,5].map(function(n){return '<button type="button" onclick="setStars(\''+r.id+'\','+n+')">★</button>';}).join('')+'</div>'+
+      '<label>פרויקט (אם עבד איתנו)</label><input list="projects" id="p-'+r.id+'" placeholder="שם הפרויקט, או ריק">'+
+      '<label>מחיר (אם היה)</label><input id="pr-'+r.id+'" inputmode="numeric" placeholder="למשל 2,500">'+
+      (r.phone?'':'<label>טלפון (חסר במאגר)</label><input id="ph-'+r.id+'" inputmode="tel" placeholder="050-000-0000">')+
+      '<label>הערה</label><textarea id="t-'+r.id+'" placeholder="איך היה, למה כן, למה לא"></textarea>'+
+      '<div class="acts"><button class="btn p" onclick="saveNote(\''+r.id+'\')">שמור</button><button class="btn ghost" onclick="noteForm(\''+r.id+'\')">ביטול</button></div>'+
+    '</div>'+
+  '</div>';
+}
+
+var starsState = {};
+var armed = {};
+function saveLocal(){ try{ localStorage.setItem('connecta_data', JSON.stringify({t:Date.now(), rows:DATA})); }catch(e){} }
+function hideRow(id){
+  var b = document.getElementById('del-'+id);
+  if (!armed[id]){ armed[id]=true; b.classList.add('arm'); b.textContent='להסיר מהמאגר? לחץ שוב'; setTimeout(function(){ if(armed[id]){ armed[id]=false; if(b){ b.classList.remove('arm'); b.textContent='לא רלוונטי'; } } },3500); return; }
+  armed[id]=false;
+  var idx = -1; for (var i=0;i<DATA.length;i++){ if(DATA[i].id===id){ idx=i; break; } }
+  if (idx<0) return;
+  var row = DATA.splice(idx,1)[0];
+  saveLocal(); render();
+  undoToast('הוסר: '+row.name, function(){ DATA.splice(idx,0,row); saveLocal(); render(); google.script.run.withFailureHandler(function(e){ toast('שגיאה: '+(e.message||e)); }).api_setHidden(id,false); });
+  google.script.run.withSuccessHandler(function(res){ if(!res||!res.ok){ toast('לא נמחק: '+((res&&res.message)||'')); DATA.splice(idx,0,row); saveLocal(); render(); } })
+    .withFailureHandler(function(e){ toast('שגיאה: '+(e.message||e)); DATA.splice(idx,0,row); saveLocal(); render(); }).api_setHidden(id,true);
+}
+var undoTimer=null;
+function undoToast(msg, onUndo){
+  var t=document.getElementById('toast'); clearTimeout(undoTimer);
+  t.innerHTML=''; var span=document.createElement('span'); span.textContent=msg; var u=document.createElement('button'); u.textContent='ביטול';
+  u.onclick=function(){ clearTimeout(undoTimer); t.classList.remove('show','undo'); onUndo(); toast('הוחזר'); };
+  t.appendChild(span); t.appendChild(u); t.classList.add('show','undo');
+  undoTimer=setTimeout(function(){ t.classList.remove('show','undo'); },6000);
+}
+function toggle(id){ document.getElementById('c-'+id).classList.toggle('open'); }
+function noteForm(id){ var c=document.getElementById('c-'+id); c.classList.toggle('noting'); if(c.classList.contains('noting')) c.classList.add('open'); }
+function setStars(id,n){ starsState[id]=n; var bs=document.querySelectorAll('#rate-'+id+' button'); bs.forEach(function(b,i){ b.classList.toggle('on', i<n); }); }
+function toast(msg){ var t=document.getElementById('toast'); t.classList.remove('undo'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2200); }
+function saveNote(id){
+  var r = DATA.filter(function(x){return x.id===id;})[0]; if(!r) return;
+  var note = { id:id, name:r.name, stars: starsState[id]||0, project: document.getElementById('p-'+id).value.trim(),
+               price: document.getElementById('pr-'+id).value.trim(), text: document.getElementById('t-'+id).value.trim(), role: r.fields.split(';')[0],
+               phone: (document.getElementById('ph-'+id) ? document.getElementById('ph-'+id).value.trim() : '') };
+  if (!note.text && !note.stars && !note.project && !note.phone){ toast('כתוב משהו או תן דירוג'); return; }
+  toast('שומר...');
+  google.script.run.withSuccessHandler(function(res){
+    if (!res.ok){ toast(res.message||'לא נשמר'); return; }
+    // update locally without a reload
+    r.userNotes = r.userNotes||[]; r.userNotes.unshift({d:new Date().toISOString().slice(0,10), who:ME.name, stars:note.stars, project:note.project, price:note.price, text:note.text});
+    var rated=r.userNotes.filter(function(n){return n.stars>0}); r.avg = rated.length?Math.round(rated.reduce(function(a,n){return a+n.stars},0)/rated.length*10)/10:0;
+    if (note.phone){ r.phone = r.phone ? r.phone+' / '+note.phone : note.phone; }
+    if (note.project){ r.n=(r.n||0)+1; r.level='עבד איתנו'; r.projects = r.projects? r.projects+'; '+note.project : note.project; if(note.price) r.price=note.price; r.works=(r.works||[]).concat([{p:note.project,r:note.role,price:note.price}]); }
+    r._h = null; starsState[id]=0;
+    try{ localStorage.setItem('connecta_data', JSON.stringify({t:Date.now(), rows:DATA})); }catch(e){}
+    toast('נשמר'); render();
+  }).withFailureHandler(function(err){ toast('שגיאה: '+(err.message||err)); }).api_addNote(note);
+}
+
+/* ---------- boot ---------- */
+function boot(rows){
+  DATA = rows;
+  var counts = {}; rows.forEach(function(r){ String(r.cat||'').split(';').forEach(function(c){ c=c.trim(); if(c) counts[c]=(counts[c]||0)+1; }); });
+  var names = Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; });
+  var box = document.getElementById('cats');
+  box.innerHTML = names.map(function(c){ return '<button class="ftog" data-k="cat" data-v="'+esc(c)+'">'+esc(c)+'</button>'; }).join('');
+  box.querySelectorAll('.ftog').forEach(function(b){ b.addEventListener('click', function(){
+    state.cat = (state.cat===b.dataset.v) ? '' : b.dataset.v;
+    box.querySelectorAll('.ftog').forEach(function(x){ x.classList.toggle('on', x.dataset.v===state.cat); });
+    render(); window.scrollTo(0,0);
+  }); });
+  render();
+  var dl = document.createElement('datalist'); dl.id='projects'; document.body.appendChild(dl);
+  google.script.run.withSuccessHandler(function(ps){ PROJECTS=ps||[]; dl.innerHTML = PROJECTS.map(function(p){return '<option value="'+esc(p)+'">';}).join(''); }).api_getProjects();
+}
+function load(force){
+  var cached = null;
+  try { cached = JSON.parse(localStorage.getItem('connecta_data')||'null'); } catch(e){}
+  if (cached && cached.rows && !force){ boot(cached.rows); if (Date.now()-cached.t < 10*60*1000) return; }
+  google.script.run.withSuccessHandler(function(d){
+    try{ localStorage.setItem('connecta_data', JSON.stringify({t:Date.now(), rows:d.rows})); }catch(e){}
+    if (!cached || force) { boot(d.rows); return; }
+    DATA = d.rows;
+    // a background refresh must not wipe a note being typed; re-render only when nothing is being edited
+    if (!document.querySelector('.card.noting')) render();
+  }).withFailureHandler(function(err){ document.getElementById('results').innerHTML='<div class="empty">לא הצלחתי לטעון את המאגר: '+esc(err.message||err)+'</div>'; }).api_getData(!!force);
+}
+if (KEY) google.script.run.withSuccessHandler(function(me){ ME=me; document.getElementById('hello').textContent='היי '+me.name; }).api_whoAmI();
+var qEl = document.getElementById('q'), timer=null;
+qEl.addEventListener('input', function(){ qEl.parentNode.classList.toggle('has', !!qEl.value); clearTimeout(timer); timer=setTimeout(function(){ state.q=qEl.value; render(); window.scrollTo(0,0); },180); });
+document.getElementById('clear').addEventListener('click', function(){ qEl.value=''; qEl.parentNode.classList.remove('has'); state.q=''; render(); qEl.focus(); });
+document.querySelectorAll('.ftog').forEach(function(b){
+  b.addEventListener('click', function(){
+    var k=b.dataset.k, v=b.dataset.v;
+    state[k] = (state[k]===v && v!=='') ? '' : v;
+    document.querySelectorAll('.ftog[data-k="'+k+'"]').forEach(function(x){ x.classList.toggle('on', x.dataset.v===state[k] && !(x.dataset.v==='' && state[k]==='') ); });
+    if (k==='type' && state.type==='') document.querySelector('.ftog[data-k="type"][data-v=""]').classList.add('on');
+    render();
+  });
+});
+document.querySelector('.ftog[data-k="type"][data-v=""]').classList.add('on');
+if (KEY) load(false);
+</script>
+</body>
+</html>
